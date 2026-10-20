@@ -36,3 +36,4 @@ Help a coach browse drills and build a simple practice plan.
 
 \- \[ ] Frontend displays the API health response
 
+# KickStartSoccer
