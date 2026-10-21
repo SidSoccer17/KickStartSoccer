@@ -1,0 +1,24 @@
+# Java / Maven
+kickstart-soccer-api/target/
+*.class
+
+# Node / Ionic / Angular
+kickstart-soccer-web/node_modules/
+kickstart-soccer-web/www/
+kickstart-soccer-web/.angular/
+kickstart-soccer-web/dist/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.iml
+
+# Local secrets and environment files
+.env
+.env.*
+application-local.properties
+application-dev.properties
+
+# Operating-system files
+.DS_Store
+Thumbs.db
