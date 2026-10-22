@@ -1,4 +1,5 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 
 type RoleId = 'coach' | 'parent' | 'player';
@@ -11,6 +12,8 @@ type RoleId = 'coach' | 'parent' | 'player';
   imports: [IonContent]
 })
 export class Tab1Page {
+  private readonly router = inject(Router);
+
   readonly roles: ReadonlyArray<{
     id: RoleId;
     label: string;
@@ -25,6 +28,10 @@ export class Tab1Page {
 
   selectRole(role: RoleId): void {
     this.selectedRole.set(role);
+
+    if (role === 'coach') {
+      void this.router.navigateByUrl('/tabs/tab3');
+    }
   }
 
   roleLabel(roleId: RoleId): string {

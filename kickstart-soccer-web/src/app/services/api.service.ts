@@ -8,6 +8,18 @@ export interface HealthResponse {
   status: string;
 }
 
+export interface Drill {
+  id: string;
+  title: string;
+  ageGroups: string[];
+  category: string;
+  difficulty: string;
+  durationMinutes: number;
+  instructions: string[];
+  coachingTips: string[];
+  equipment: string[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
@@ -15,5 +27,9 @@ export class ApiService {
 
   getHealth(): Observable<HealthResponse> {
     return this.http.get<HealthResponse>(`${this.baseUrl}/health`);
+  }
+
+  getDrills(): Observable<Drill[]> {
+    return this.http.get<Drill[]>(`${this.baseUrl}/drills`);
   }
 }

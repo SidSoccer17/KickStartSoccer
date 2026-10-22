@@ -1,17 +1,70 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Training
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="coach-content">
+  <main class="coach-dashboard">
+    <section class="dashboard-intro" aria-labelledby="dashboard-title">
+      <p class="eyebrow dashboard-eyebrow">KICKSTART SOCCER</p>
+      <h1 id="dashboard-title">Coach Dashboard</h1>
+      <p class="dashboard-tagline">Plan your next practice with drills designed to help players grow.</p>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Training</ion-title>
-    </ion-toolbar>
-  </ion-header>
+      <div class="summary-grid" aria-label="Practice planning overview">
+        <a class="summary-card" href="#drill-library">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5c2.7-.9 5.3-.5 8 1.2v13c-2.7-1.7-5.3-2.1-8-1.2zm16 0c-2.7-.9-5.3-.5-8 1.2v13c2.7-1.7 5.3-2.1 8-1.2z" /></svg>
+          <strong>{{ isLoading() ? '...' : drills().length }}</strong>
+          <span>Available drills</span>
+        </a>
+        <a class="summary-card" routerLink="/tabs/tab2">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M9 9h6m-6 4h6m-6 4h4"/></svg>
+          <strong>{{ selectionCount() }}</strong>
+          <span>Practice selections</span>
+        </a>
+      </div>
+    </section>
 
-  <app-explore-container name="Training page"></app-explore-container>
+    <section id="drill-library" class="drill-library" aria-labelledby="drill-library-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">PRACTICE PLANNING</p>
+          <h2 id="drill-library-title">Drill Library</h2>
+        </div>
+        <span class="drill-count">{{ drills().length }} drills</span>
+      </div>
+
+      @if (isLoading()) {
+        <p class="drill-message" role="status">Loading drills...</p>
+      } @else if (errorMessage(); as error) {
+        <div class="drill-error" role="alert">
+          <p>{{ error }}</p>
+          <button type="button" (click)="loadDrills()">Try again</button>
+        </div>
+      } @else if (drills().length === 0) {
+        <p class="drill-message">No drills are available yet.</p>
+      } @else {
+        @if (selectionMessage(); as message) {
+          <p class="drill-message" role="status">{{ message }}</p>
+        }
+        <div class="drill-list">
+          @for (drill of drills(); track drill.id) {
+            <article class="drill-card">
+              <div class="drill-icon" aria-hidden="true">&#9917;</div>
+              <div class="drill-details">
+                <h3>{{ drill.title }}</h3>
+                <p>{{ drill.category }} &middot; {{ drill.ageGroups.join(', ') }}</p>
+                <div class="drill-meta">
+                  <span>{{ drill.durationMinutes }} min</span>
+                  <span>{{ drill.difficulty }}</span>
+                </div>
+              </div>
+              <button
+                class="add-button"
+                type="button"
+                [disabled]="practiceSelection.isSelected(drill.id)"
+                (click)="addToPractice(drill)"
+              >
+                {{ practiceSelection.isSelected(drill.id) ? 'Already selected' : 'Add to practice' }}
+              </button>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  </main>
 </ion-content>

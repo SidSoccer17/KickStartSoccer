@@ -1,17 +1,119 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Teams
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="practice-content">
+  <main class="practice-page">
+    <a class="back-link" routerLink="/tabs/tab3">Back to Coach Dashboard</a>
+    <header class="page-heading">
+      <p class="eyebrow">PRACTICE PLANNING</p>
+      <h1>Practice Plan</h1>
+      <p>Choose drills from the library, then arrange them in the order you want to run them.</p>
+    </header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Teams</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <section class="practice-editor" aria-labelledby="practice-name-label">
+      <label id="practice-name-label" for="practice-name">Practice name</label>
+      <input
+        id="practice-name"
+        type="text"
+        maxlength="100"
+        autocomplete="off"
+        [value]="practiceSelection.name()"
+        [attr.aria-invalid]="nameError() ? 'true' : null"
+        aria-describedby="practice-storage-note"
+        (input)="updateName($event)"
+      />
+      @if (nameError(); as error) {
+        <p id="name-error" class="form-message error-message" role="alert">{{ error }}</p>
+      }
+      <p id="practice-storage-note" class="storage-note">
+        Saved locally on this browser/device only; it is not account-based or available across devices.
+      </p>
+      <div class="editor-actions">
+        <button class="save-button" type="button" (click)="savePractice()">Save practice</button>
+        <button class="clear-button" type="button" (click)="clearCurrentSelection()">Clear current selection</button>
+        <button class="new-button" type="button" (click)="startNewPractice()">New practice</button>
+      </div>
+      @if (practiceSelection.isDirty()) {
+        <p class="form-message" role="status">Unsaved changes</p>
+      }
+      @if (saveMessage() && !practiceSelection.isDirty()) {
+        <p class="form-message" role="status">{{ saveMessage() }}</p>
+      }
+      @if (practiceSelection.persistenceError(); as error) {
+        <p class="form-message error-message" role="alert">{{ error }}</p>
+      }
+    </section>
 
-  <app-explore-container name="Teams page"></app-explore-container>
+    <section class="saved-practices" aria-labelledby="saved-practices-title">
+      <div class="list-heading">
+        <h2 id="saved-practices-title">Saved practices</h2>
+        <span>{{ practiceSelection.savedPractices().length }}</span>
+      </div>
+      @if (practiceSelection.savedPractices().length === 0) {
+        <p class="saved-empty">No saved practices yet. Name this plan and save it to this device.</p>
+      } @else {
+        <ul>
+          @for (practice of practiceSelection.savedPractices(); track practice.id) {
+            <li class="saved-practice">
+              <div class="saved-copy">
+                <h3>{{ practice.name }}</h3>
+                <p>{{ practice.drills.length }} drills &middot; {{ planDuration(practice.id) }} min</p>
+              </div>
+              <button class="open-button" type="button" (click)="openPractice(practice.id)">Open</button>
+              <button class="delete-button" type="button" [attr.aria-label]="'Delete ' + practice.name" (click)="deletePractice(practice.id)">Delete</button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="plan-summary" aria-label="Practice plan summary" aria-live="polite">
+      <div>
+        <strong>{{ practiceSelection.selectionCount() }}</strong>
+        <span>{{ practiceSelection.selectionCount() === 1 ? 'drill selected' : 'drills selected' }}</span>
+      </div>
+      <div>
+        <strong>{{ practiceSelection.totalDurationMinutes() }}</strong>
+        <span>estimated minutes</span>
+      </div>
+    </section>
+
+    @if (practiceSelection.drills().length === 0) {
+      <section class="empty-state" aria-labelledby="empty-title">
+        <div class="empty-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" focusable="false">
+            <circle cx="16" cy="16" r="13" />
+            <path d="m16 9 4 3-1.5 5h-5L12 12l4-3Zm-4 3-4-1m12 1 4-1m-9.5 5L11 20l1.5 5m6-8L21 20l-1.5 5M11 20l-3 2m13-2 3 2m-11.5 3L16 27l4.5-1" />
+          </svg>
+        </div>
+        <h2 id="empty-title">Your practice plan is empty</h2>
+        <p>Browse the drill library and add activities to build a practice that fits your team.</p>
+        <a class="primary-link" routerLink="/tabs/tab3">Browse drills</a>
+      </section>
+    } @else {
+      <section class="selected-drills" aria-labelledby="selected-title">
+        <div class="list-heading">
+          <h2 id="selected-title">Selected drills</h2>
+        </div>
+        <ol>
+          @for (drill of practiceSelection.drills(); track drill.id; let index = $index) {
+            <li class="selected-card">
+              <span class="step-number" aria-label="Step {{ index + 1 }}">{{ index + 1 }}</span>
+              <div class="drill-copy">
+                <h3>{{ drill.title }}</h3>
+                <p>{{ drill.category }} &middot; {{ drill.durationMinutes }} min &middot; {{ drill.difficulty }}</p>
+              </div>
+              <div class="order-actions" [attr.aria-label]="'Reorder ' + drill.title">
+                <button type="button" [disabled]="index === 0" [attr.aria-label]="'Move ' + drill.title + ' up'" (click)="moveDrill(drill.id, -1)">
+                  <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="m5 12 5-5 5 5" /></svg>
+                </button>
+                <button type="button" [disabled]="index === practiceSelection.drills().length - 1" [attr.aria-label]="'Move ' + drill.title + ' down'" (click)="moveDrill(drill.id, 1)">
+                  <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="m5 8 5 5 5-5" /></svg>
+                </button>
+              </div>
+              <button class="remove-button" type="button" [attr.aria-label]="'Remove ' + drill.title" (click)="removeDrill(drill.id)">Remove</button>
+            </li>
+          }
+        </ol>
+        <a class="secondary-link" routerLink="/tabs/tab3">Add more drills</a>
+      </section>
+    }
+  </main>
 </ion-content>
