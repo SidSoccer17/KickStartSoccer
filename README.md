@@ -12,6 +12,15 @@ I wanted to build a simple app where coaches could find drills, put together pra
 
 I'm also interested in coding and engineering, so I thought this would be a fun way to combine two things I enjoy: soccer and technology.
 
+## Demo
+
+KickStartSoccer is a functional youth soccer coaching app built with
+Ionic/Angular and Spring Boot.
+
+[Watch the 90-second demo](docs/demo/kickstartsoccer-demo.mp4)
+
+Pilot/user rollout is planned for Nov–Dec 2026.
+
 ## What I've Built So Far
 
 The app currently lets coaches:
