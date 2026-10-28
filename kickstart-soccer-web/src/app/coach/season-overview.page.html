@@ -1,36 +1,101 @@
 <ion-content [fullscreen]="true" class="season-content">
   <main class="season-page">
-    <a class="back-link" routerLink="/coach/seasons/new">Back to seasons</a>
+    <a class="back-link" routerLink="/seasons">Back to seasons</a>
     @if (season(); as current) {
-      <header class="page-heading"><p class="eyebrow">SEASON PLAN</p><h1>{{ current.term === 'spring' ? 'Spring' : 'Fall' }} {{ current.ageGroup }}</h1><p>{{ current.weeks }} weeks · {{ current.practiceDurationMinutes }} minute practices · {{ current.minPlayers }}–{{ current.maxPlayers }} players</p></header>
+      <header class="page-heading">
+        <p class="eyebrow">SEASON PLAN</p>
+        <h1>{{ current.term === 'spring' ? 'Spring' : 'Fall' }} {{ current.ageGroup }}</h1>
+        <p>{{ current.weeks }} weeks &middot; {{ current.practiceDurationMinutes }} minute practices &middot; {{ current.minPlayers }}&ndash;{{ current.maxPlayers }} players</p>
+      </header>
       <div class="season-save">
         <button type="button" (click)="saveSeason()">Save season updates</button>
         @if (hasUnsavedChanges()) { <p role="status">You have unsaved changes to this season.</p> }
         @if (saveMessage(); as message) { <p role="status">{{ message }}</p> }
       </div>
-      <section class="week-list" aria-label="Weekly season plan">
-        @for (session of weeks(); track session.id) {
-          <article class="week-card">
-            <div class="week-title"><p class="eyebrow">WEEK {{ session.weekNumber }}</p><h2>Practice {{ session.sessionNumber }}</h2></div>
-            @if (assignedPractice(session.practicePlanId); as practice) {
-              <p class="assigned-plan"><a [routerLink]="['/coach/practices', practice.id]" [queryParams]="{seasonId: current.id}">{{ practice.name }}</a><span>{{ practice.drills.length }} activities</span></p>
-            } @else {
-              <p class="unassigned">{{ session.practicePlanId ? 'Previously assigned practice is no longer saved.' : 'No practice assigned' }}</p>
+      <section class="season-journey" aria-labelledby="journey-title">
+        <header class="journey-heading">
+          <div>
+            <h2 id="journey-title">Season journey</h2>
+            <p>Select a week to explore its practice and drills.</p>
+          </div>
+          <span class="journey-count">{{ weeks().length }} weeks</span>
+        </header>
+        <div class="journey-scroll" tabindex="0" aria-label="Season weeks; scroll horizontally to explore">
+          <div class="journey-track">
+            @for (session of weeks(); track session.id) {
+              <button
+                class="journey-station"
+                type="button"
+                [class.is-selected]="selectedSession().id === session.id"
+                [attr.aria-pressed]="selectedSession().id === session.id"
+                [attr.aria-label]="'Week ' + session.weekNumber + ': ' + skillForWeek(session.weekNumber)"
+                (click)="selectSession(session.id)"
+              >
+                <span class="station-marker" aria-hidden="true"></span>
+                <span class="station-week">Week {{ session.weekNumber }}</span>
+                <ion-icon
+                  class="station-skill-icon"
+                  [class.station-skill-icon--orange]="skillIconForWeek(session.weekNumber) === 'location'"
+                  [name]="skillIconForWeek(session.weekNumber)"
+                  aria-hidden="true"
+                />
+                <span class="station-skill">{{ skillForWeek(session.weekNumber) }}</span>
+              </button>
             }
-            <label [for]="'date-' + session.id">Practice date (optional)</label>
+          </div>
+        </div>
+      </section>
+
+      @if (selectedSession(); as session) {
+        <article class="week-card" aria-live="polite">
+          <header class="week-heading">
+            <div>
+              <p class="eyebrow">WEEK {{ session.weekNumber }}</p>
+              <h2>{{ skillForWeek(session.weekNumber) }}</h2>
+              <p class="week-meta">Practice {{ session.sessionNumber }} &middot; {{ current.practiceDurationMinutes }} minutes &middot; {{ session.scheduledDate || 'Date not set' }}</p>
+            </div>
+            @if (assignedPractice(session.practicePlanId); as practice) {
+              <a class="open-practice" [routerLink]="['/coach/practices', practice.id]" [queryParams]="{seasonId: current.id}">Open practice <span aria-hidden="true">&rarr;</span></a>
+            }
+          </header>
+          @if (assignedPractice(session.practicePlanId); as practice) {
+            <div class="practice-summary">
+              <h3>{{ practice.name }}</h3>
+              <span>{{ practice.drills.length }} {{ practice.drills.length === 1 ? 'drill' : 'drills' }}</span>
+            </div>
+            @if (practice.drills.length > 0) {
+              <ol class="drill-sequence" aria-label="Practice drill progression">
+                @for (drill of practice.drills; track drill.id; let index = $index) {
+                  <li class="drill-stop">
+                    <span class="drill-number">{{ index + 1 }}</span>
+                    <strong>{{ drill.title }}</strong>
+                    <span class="drill-meta">{{ drill.category }} &middot; {{ drill.durationMinutes }} min</span>
+                  </li>
+                }
+              </ol>
+            } @else {
+              <p class="unassigned">This saved practice has no drills yet.</p>
+            }
+          } @else {
+            <p class="unassigned">{{ session.practicePlanId ? 'Previously assigned practice is no longer saved.' : 'No practice assigned to this week yet.' }}</p>
+          }
+          <div class="week-controls">
+            <label [for]="'date-' + session.id">Practice date</label>
             <input [id]="'date-' + session.id" type="date" [value]="session.scheduledDate ?? ''" (change)="setScheduledDate(session.id, $event)" />
             <label [for]="'practice-' + session.id">Assign a saved practice</label>
             <select [id]="'practice-' + session.id" [value]="session.practicePlanId ?? ''" (change)="assignPractice(session.id, $event)">
               <option value="">Unassigned</option>
               @for (practice of practices.savedPractices(); track practice.id) { <option [value]="practice.id">{{ practice.name }}</option> }
             </select>
-          </article>
-        }
-      </section>
+          </div>
+        </article>
+      }
       @if (planning.persistenceError(); as error) { <p class="error-message" role="alert">{{ error }}</p> }
-      @if (practices.savedPractices().length === 0) { <p class="empty-note">Save a practice in the Practice Plan tab to assign it here.</p> }
+      @if (practices.savedPractices().length === 0) {
+        <p class="empty-note">Save a named practice first, then assign it to this week. <a routerLink="/plan">Build a practice</a></p>
+      }
     } @else {
-      <section class="not-found"><h1>Season not found</h1><p>This season may have been removed from local storage.</p><a routerLink="/coach/seasons/new">Create or open a season</a></section>
+      <section class="not-found"><h1>Season not found</h1><p>This season may have been removed from local storage.</p><a routerLink="/seasons">Open My Seasons</a></section>
     }
   </main>
 </ion-content>

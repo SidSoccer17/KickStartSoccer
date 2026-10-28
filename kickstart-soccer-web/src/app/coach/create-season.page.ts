@@ -2,12 +2,14 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 import { NewSeason, SeasonAgeGroup, SeasonTerm } from '../models/season.model';
+import { PracticeSelectionService } from '../services/practice-selection.service';
 import { SeasonPlanningService } from '../services/season-planning.service';
 
 @Component({ selector: 'app-create-season', templateUrl: './create-season.page.html', styleUrl: './create-season.page.scss', imports: [IonContent, RouterLink] })
 export class CreateSeasonPage {
   private readonly router = inject(Router);
   readonly planning = inject(SeasonPlanningService);
+  readonly practices = inject(PracticeSelectionService);
   readonly term = signal<SeasonTerm>('spring');
   readonly ageGroup = signal<SeasonAgeGroup>('U6');
   readonly weeks = signal('8');

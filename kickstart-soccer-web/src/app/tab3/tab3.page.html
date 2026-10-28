@@ -1,34 +1,48 @@
 <ion-content [fullscreen]="true" class="coach-content">
   <main class="coach-dashboard">
-    <section class="dashboard-intro" aria-labelledby="dashboard-title">
-      <p class="eyebrow dashboard-eyebrow">KICKSTART SOCCER</p>
-      <h1 id="dashboard-title">Coach Dashboard</h1>
-      <p class="dashboard-tagline">Plan your next practice with drills designed to help players grow.</p>
-
-      <div class="summary-grid" aria-label="Practice planning overview">
-        <a class="summary-card" href="#drill-library">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5c2.7-.9 5.3-.5 8 1.2v13c-2.7-1.7-5.3-2.1-8-1.2zm16 0c-2.7-.9-5.3-.5-8 1.2v13c2.7-1.7 5.3-2.1 8-1.2z" /></svg>
-          <strong>{{ isLoading() ? '...' : drills().length }}</strong>
-          <span>Available drills</span>
-        </a>
-        <a class="summary-card" routerLink="/coach/seasons/new">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18" /></svg>
-          <strong>{{ seasonPlanning.seasonCount() }}</strong>
-          <span>Season plans</span>
-        </a>
-        <a class="summary-card" routerLink="/tabs/tab2">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M9 9h6m-6 4h6m-6 4h4"/></svg>
-          <strong>{{ selectionCount() }}</strong>
-          <span>Practice selections</span>
-        </a>
+    <header class="library-heading">
+      <p class="eyebrow">KICKSTART SOCCER</p>
+      <h1>Drill Library</h1>
+      <p>Browse activities by age group, focus, and skill.</p>
+    </header>
+    <section class="practice-draft" aria-labelledby="practice-draft-title">
+      <div class="practice-draft-summary">
+        <div>
+          <p class="eyebrow">{{ practiceSelection.selectionCount() > 0 ? 'PRACTICE IN PROGRESS' : 'CREATE A PRACTICE' }}</p>
+          <h2 id="practice-draft-title">
+            @if (practiceSelection.selectionCount() > 0) {
+              {{ practiceSelection.selectionCount() }} {{ practiceSelection.selectionCount() === 1 ? 'drill' : 'drills' }} selected
+            } @else {
+              Choose a name and add drills
+            }
+          </h2>
+        </div>
+        <span>{{ practiceSelection.totalDurationMinutes() }} min</span>
+      </div>
+      <label for="library-practice-name">Name this practice to save it</label>
+      <input
+        id="library-practice-name"
+        type="text"
+        maxlength="100"
+        autocomplete="off"
+        placeholder="e.g. Ball control and passing"
+        [formControl]="practiceName"
+        [attr.aria-invalid]="practiceNameError() ? 'true' : null"
+      />
+      @if (practiceSelection.selectionCount() === 0) { <p class="practice-draft-hint">Select drills below to enable saving.</p> }
+      @if (practiceNameError(); as error) { <p class="practice-form-error" role="alert">{{ error }}</p> }
+      @if (practiceSelection.persistenceError(); as error) { <p class="practice-form-error" role="alert">{{ error }}</p> }
+      <div class="practice-draft-actions">
+        <button class="save-practice-button" type="button" [disabled]="practiceSelection.selectionCount() === 0" (click)="savePractice()">Save practice</button>
+        <a routerLink="/plan">Arrange drills and view saved practices</a>
       </div>
     </section>
-
+    @if (practiceSaveMessage(); as message) { <p class="practice-save-status" role="status">{{ message }}</p> }
     <section id="drill-library" class="drill-library" aria-labelledby="drill-library-title">
       <div class="section-heading">
         <div>
           <p class="eyebrow">PRACTICE PLANNING</p>
-          <h2 id="drill-library-title">Drill Library</h2>
+          <h2 id="drill-library-title">Available drills</h2>
         </div>
         <span class="drill-count">{{ filteredDrills().length }} of {{ drills().length }} drills</span>
       </div>
@@ -79,11 +93,12 @@
               <a class="details-link" [routerLink]="['/coach/drills', drill.id]">View details</a>
               <button
                 class="add-button"
+                [class.is-selected]="practiceSelection.isSelected(drill.id)"
                 type="button"
-                [disabled]="practiceSelection.isSelected(drill.id)"
+                [attr.aria-pressed]="practiceSelection.isSelected(drill.id)"
                 (click)="addToPractice(drill)"
               >
-                {{ practiceSelection.isSelected(drill.id) ? 'Already selected' : 'Add to practice' }}
+                {{ practiceSelection.isSelected(drill.id) ? 'Remove from practice' : 'Add to practice' }}
               </button>
             </article>
           }

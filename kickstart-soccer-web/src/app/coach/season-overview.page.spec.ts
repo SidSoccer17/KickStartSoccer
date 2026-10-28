@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import { PracticeSelectionService } from '../services/practice-selection.service';
+import { Drill } from '../services/api.service';
 import { SeasonPlanningService } from '../services/season-planning.service';
 import { SeasonOverviewPage } from './season-overview.page';
 
@@ -22,7 +23,13 @@ describe('SeasonOverviewPage', () => {
   afterEach(() => { localStorage.clear(); TestBed.resetTestingModule(); });
 
   it('requires saving season changes after assigning or unassigning a practice', () => {
-    expect(fixture.nativeElement.querySelectorAll('.week-card')).toHaveLength(8);
+    expect(fixture.nativeElement.querySelectorAll('.journey-station')).toHaveLength(8);
+    expect(fixture.nativeElement.querySelectorAll('.week-card')).toHaveLength(1);
+    const skillIcons = fixture.nativeElement.querySelectorAll('.station-skill-icon') as NodeListOf<HTMLElement>;
+    expect(Array.from(skillIcons).map((icon) => icon.getAttribute('name'))).toEqual([
+      'football', 'walk', 'swap-horizontal', 'location', 'arrow-forward', 'walk', 'people', 'football',
+    ]);
+    expect(skillIcons[3].classList).toContain('station-skill-icon--orange');
     const planning = TestBed.inject(SeasonPlanningService);
     const select = fixture.nativeElement.querySelector('select') as HTMLSelectElement;
     const saveButton = fixture.nativeElement.querySelector('.season-save button') as HTMLButtonElement;
@@ -50,5 +57,36 @@ describe('SeasonOverviewPage', () => {
     fixture.detectChanges();
     expect(planning.findSeason('season-1')?.sessions[0].practicePlanId).toBeNull();
     expect(TestBed.inject(PracticeSelectionService).savedPractices()).toHaveLength(1);
+  });
+
+  it('keeps the planned week skill label when an assigned drill has a different primary skill', () => {
+    const practiceSelection = TestBed.inject(PracticeSelectionService);
+    const drill: Drill = {
+      id: 'dribbling-drill', title: 'Dribble Gates', ageGroups: ['U6'], category: 'Dribbling',
+      difficulty: 'Beginner', durationMinutes: 6, instructions: [], coachingTips: [], equipment: [],
+      primarySkill: 'Dribbling',
+    };
+    practiceSelection.setName('Dribbling practice');
+    practiceSelection.add(drill);
+    expect(practiceSelection.saveCurrent()).toBe(true);
+    fixture.detectChanges();
+
+    const select = fixture.nativeElement.querySelector('select') as HTMLSelectElement;
+    select.value = practiceSelection.savedPractices()[1].id;
+    select.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.journey-station .station-skill').textContent).toContain('Ball confidence');
+    expect(fixture.nativeElement.querySelector('.station-skill-icon').getAttribute('name')).toBe('football');
+    expect(fixture.nativeElement.querySelector('.week-heading h2').textContent).toContain('Ball confidence');
+  });
+
+  it('updates the selected practice details when a journey week is selected', () => {
+    const stations = fixture.nativeElement.querySelectorAll('.journey-station') as NodeListOf<HTMLButtonElement>;
+    stations[1].click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.week-heading').textContent).toContain('WEEK 2');
+    expect(fixture.nativeElement.querySelector('.week-meta').textContent).toContain('Practice 1');
   });
 });

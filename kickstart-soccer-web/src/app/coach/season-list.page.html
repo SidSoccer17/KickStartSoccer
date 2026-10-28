@@ -1,0 +1,52 @@
+<ion-content [fullscreen]="true" class="season-list-content">
+  <main class="season-list-page">
+    <header class="page-heading">
+      <p class="eyebrow">COACH PLANNING</p>
+      <h1>My Seasons</h1>
+      <p>Season plans and scheduled practices saved on this device.</p>
+      <a class="primary-link" routerLink="/coach/seasons/new">Create a season</a>
+    </header>
+
+    @if (planning.persistenceError(); as error) {
+      <p class="error-message" role="alert">{{ error }}</p>
+    }
+
+    <section class="season-section" aria-labelledby="seasons-title">
+      <h2 id="seasons-title">Season plans</h2>
+      @if (planning.seasons().length === 0) {
+        <p class="empty-note">No seasons yet. Create one to start scheduling practices.</p>
+      } @else {
+        <ul class="season-list">
+          @for (season of planning.seasons(); track season.id) {
+            <li>
+              <a [routerLink]="['/coach/seasons', season.id]">
+                <strong>{{ season.term === 'spring' ? 'Spring' : 'Fall' }} {{ season.ageGroup }}</strong>
+                <span>{{ season.weeks }} weeks · {{ season.practiceDurationMinutes }} min practices</span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="season-section" aria-labelledby="calendar-title">
+      <h2 id="calendar-title">Scheduled practices</h2>
+      @if (scheduledSessions().length === 0) {
+        <p class="empty-note">Add dates to sessions in a season plan to see them here.</p>
+      } @else {
+        <ul class="calendar-list">
+          @for (item of scheduledSessions(); track item.session.id) {
+            <li>
+              <time [attr.datetime]="item.session.scheduledDate">
+                {{ item.session.scheduledDate | date: 'EEE, MMM d, y' : 'UTC' }}
+              </time>
+              <a [routerLink]="['/coach/seasons', item.season.id]">
+                {{ item.season.term === 'spring' ? 'Spring' : 'Fall' }} {{ item.season.ageGroup }} · Week {{ item.session.weekNumber }}
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </main>
+</ion-content>

@@ -1,7 +1,7 @@
 <ion-content [fullscreen]="true" class="detail-content">
   <main class="detail-page">
     @if (practice(); as plan) {
-      @if (seasonId) { <a class="back-link" [routerLink]="['/coach/seasons', seasonId]">Back to season plan</a> } @else { <a class="back-link" routerLink="/tabs/tab2">Back to Practice Plan</a> }
+      @if (seasonId) { <a class="back-link" [routerLink]="['/coach/seasons', seasonId]">Back to season plan</a> } @else { <a class="back-link" routerLink="/plan">Back to Practice Plan</a> }
       <header class="page-heading"><p class="eyebrow">PRACTICE DETAIL</p><h1>{{ plan.name }}</h1><p>{{ plan.drills.length }} activities · {{ totalDuration() }} minutes total</p></header>
       @if (activity(); as drill) {
         <article class="activity-card" aria-live="polite">
@@ -16,7 +16,7 @@
         </article>
       } @else { <p class="empty-note">This saved practice has no activities.</p> }
     } @else {
-      <section class="not-found"><h1>Practice not found</h1><p>This practice may have been removed from this device.</p><a routerLink="/tabs/tab2">Open Practice Plan</a></section>
+      <section class="not-found"><h1>Practice not found</h1><p>This practice may have been removed from this device.</p><a routerLink="/plan">Open Practice Plan</a></section>
     }
   </main>
 </ion-content>

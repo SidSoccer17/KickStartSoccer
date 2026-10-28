@@ -1,6 +1,6 @@
 <ion-content [fullscreen]="true" class="practice-content">
   <main class="practice-page">
-    <a class="back-link" routerLink="/tabs/tab3">Back to Coach Dashboard</a>
+    <a class="back-link" routerLink="/dashboard">Back to Coach Dashboard</a>
     <header class="page-heading">
       <p class="eyebrow">PRACTICE PLANNING</p>
       <h1>Practice Plan</h1>
@@ -85,7 +85,7 @@
         </div>
         <h2 id="empty-title">Your practice plan is empty</h2>
         <p>Browse the drill library and add activities to build a practice that fits your team.</p>
-        <a class="primary-link" routerLink="/tabs/tab3">Browse drills</a>
+        <a class="primary-link" routerLink="/library">Browse drills</a>
       </section>
     } @else {
       <section class="selected-drills" aria-labelledby="selected-title">
@@ -112,7 +112,7 @@
             </li>
           }
         </ol>
-        <a class="secondary-link" routerLink="/tabs/tab3">Add more drills</a>
+        <a class="secondary-link" routerLink="/library">Add more drills</a>
       </section>
     }
   </main>

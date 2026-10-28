@@ -1,0 +1,118 @@
+.season-list-content {
+  --background: #f5f7fa;
+}
+
+.season-list-page {
+  display: grid;
+  width: min(100% - 32px, 760px);
+  gap: 18px;
+  margin: 0 auto;
+  padding: 24px 0 40px;
+  color: #14243d;
+}
+
+.page-heading {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #2364d2;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 7vw, 2.3rem);
+}
+
+.page-heading > p:not(.eyebrow) {
+  margin: 0;
+  color: #66758a;
+}
+
+.primary-link {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  margin-top: 4px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: #2364d2;
+  color: #fff;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.season-section {
+  padding: 16px;
+  border: 1px solid #e0e6ee;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.season-section h2 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+.empty-note {
+  margin: 0;
+  color: #66758a;
+  line-height: 1.5;
+}
+
+.season-list,
+.calendar-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.season-list a {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 9px;
+  background: #f5f7fa;
+  color: #173b68;
+  text-decoration: none;
+}
+
+.season-list a span {
+  color: #66758a;
+  font-size: 0.85rem;
+}
+
+.calendar-list li {
+  display: grid;
+  grid-template-columns: minmax(125px, auto) 1fr;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e8edf3;
+}
+
+.calendar-list li:last-child {
+  border-bottom: 0;
+}
+
+.calendar-list time {
+  color: #52627a;
+  font-weight: 650;
+}
+
+.calendar-list a {
+  color: #2364d2;
+  font-weight: 650;
+}
+
+.error-message {
+  margin: 0;
+  color: #8d2525;
+}

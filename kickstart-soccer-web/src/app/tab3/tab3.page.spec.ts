@@ -14,6 +14,7 @@ describe('Tab3Page', () => {
   let practiceSelection: PracticeSelectionService;
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [Tab3Page],
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
@@ -30,13 +31,13 @@ describe('Tab3Page', () => {
     httpTestingController.verify();
   });
 
-  it('should create and show the dashboard metrics', () => {
+  it('should create and show the drill library', () => {
     httpTestingController.expectOne('http://localhost:8080/api/drills').flush([]);
     fixture.detectChanges();
     expect(component).toBeTruthy();
-    expect(fixture.nativeElement.textContent).toContain('Coach Dashboard');
+    expect(fixture.nativeElement.textContent).toContain('Drill Library');
     expect(fixture.nativeElement.textContent).toContain('Available drills');
-    expect(fixture.nativeElement.textContent).toContain('Practice selections');
+    expect(fixture.nativeElement.textContent).not.toContain('Coach Dashboard');
   });
 
   it('loads and displays drills from the API', () => {
@@ -82,36 +83,109 @@ describe('Tab3Page', () => {
     fixture.detectChanges();
 
     expect(practiceSelection.drills()).toEqual([drill]);
-    expect(component.selectionCount()).toBe(1);
-    expect(addButton.textContent).toContain('Already selected');
+    expect(practiceSelection.selectionCount()).toBe(1);
+    expect(addButton.textContent).toContain('Remove from practice');
+    expect(addButton.getAttribute('aria-pressed')).toBe('true');
+    addButton.click();
+    fixture.detectChanges();
+    expect(practiceSelection.drills()).toEqual([]);
+    expect(addButton.textContent).toContain('Add to practice');
+    expect(addButton.getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('prevents duplicate drill IDs and clearly identifies the selected drill', () => {
+  it('names and saves a practice directly from the drill library', () => {
     const drill: Drill = {
-      id: 'drill-1',
-      title: 'Gate Passing',
-      ageGroups: ['U6'],
-      category: 'Passing',
-      difficulty: 'Beginner',
-      durationMinutes: 6,
-      instructions: ['Pass through a cone gate.'],
-      coachingTips: [],
-      equipment: [],
+      id: 'drill-1', title: 'Gate Passing', ageGroups: ['U6'], category: 'Passing',
+      difficulty: 'Beginner', durationMinutes: 6, instructions: [], coachingTips: [], equipment: [],
     };
-    practiceSelection.add(drill);
+    httpTestingController.expectOne('http://localhost:8080/api/drills').flush([drill]);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#library-practice-name')).not.toBeNull();
+    expect((fixture.nativeElement.querySelector('.save-practice-button') as HTMLButtonElement).disabled).toBe(true);
+    (fixture.nativeElement.querySelector('.add-button') as HTMLButtonElement).click();
+    fixture.detectChanges();
 
+    const saveButton = fixture.nativeElement.querySelector('.save-practice-button') as HTMLButtonElement;
+    saveButton.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Enter a practice name before saving.');
+    expect(practiceSelection.savedPractices()).toHaveLength(0);
+
+    const nameInput = fixture.nativeElement.querySelector('#library-practice-name') as HTMLInputElement;
+    nameInput.value = 'Ball control';
+    nameInput.dispatchEvent(new Event('input'));
+    saveButton.click();
+    fixture.detectChanges();
+
+    expect(practiceSelection.savedPractices()).toHaveLength(1);
+    expect(practiceSelection.savedPractices()[0].name).toBe('Ball control');
+    expect(practiceSelection.savedPractices()[0].drills[0].id).toBe('drill-1');
+    expect(fixture.nativeElement.textContent).toContain('Practice saved. Start another practice');
+    expect(practiceSelection.name()).toBe('');
+    expect(practiceSelection.drills()).toEqual([]);
+    expect((fixture.nativeElement.querySelector('#library-practice-name') as HTMLInputElement).value).toBe('');
+    expect((fixture.nativeElement.querySelector('.save-practice-button') as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('saves a second library practice as a new practice instead of overwriting the first', () => {
+    const first: Drill = {
+      id: 'drill-1', title: 'Gate Passing', ageGroups: ['U6'], category: 'Passing',
+      difficulty: 'Beginner', durationMinutes: 6, instructions: [], coachingTips: [], equipment: [],
+    };
+    const second: Drill = { ...first, id: 'drill-2', title: 'Dribble Gates' };
+    httpTestingController.expectOne('http://localhost:8080/api/drills').flush([first, second]);
+    fixture.detectChanges();
+
+    (fixture.nativeElement.querySelectorAll('.add-button')[0] as HTMLButtonElement).click();
+    fixture.detectChanges();
+    const nameInput = fixture.nativeElement.querySelector('#library-practice-name') as HTMLInputElement;
+    nameInput.value = 'Passing practice';
+    nameInput.dispatchEvent(new Event('input'));
+    (fixture.nativeElement.querySelector('.save-practice-button') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(practiceSelection.savedPractices()).toHaveLength(1);
+    expect(practiceSelection.name()).toBe('');
+    expect(practiceSelection.drills()).toEqual([]);
+
+    (fixture.nativeElement.querySelectorAll('.add-button')[1] as HTMLButtonElement).click();
+    fixture.detectChanges();
+    const secondNameInput = fixture.nativeElement.querySelector('#library-practice-name') as HTMLInputElement;
+    expect(secondNameInput.value).toBe('');
+    secondNameInput.value = 'Dribbling practice';
+    secondNameInput.dispatchEvent(new Event('input'));
+    (fixture.nativeElement.querySelector('.save-practice-button') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(practiceSelection.savedPractices()).toHaveLength(2);
+    expect(practiceSelection.savedPractices().map((saved) => saved.name)).toEqual([
+      'Passing practice', 'Dribbling practice',
+    ]);
+    expect(practiceSelection.savedPractices().map((saved) => saved.drills[0].id)).toEqual(['drill-1', 'drill-2']);
+  });
+
+  it('lets coaches unselect a drill and add it again from the library', () => {
+    const drill: Drill = {
+      id: 'drill-1', title: 'Gate Passing', ageGroups: ['U6'], category: 'Passing',
+      difficulty: 'Beginner', durationMinutes: 6, instructions: [], coachingTips: [], equipment: [],
+    };
     httpTestingController.expectOne('http://localhost:8080/api/drills').flush([drill]);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.add-button')).toHaveProperty('disabled', true);
-    expect(fixture.nativeElement.querySelector('.add-button').textContent).toContain('Already selected');
-    component.addToPractice(drill);
+    const button = fixture.nativeElement.querySelector('.add-button') as HTMLButtonElement;
+    button.click();
     fixture.detectChanges();
-
     expect(practiceSelection.drills()).toHaveLength(1);
-    expect(fixture.nativeElement.textContent).toContain('Gate Passing is already selected');
-  });
 
+    button.click();
+    fixture.detectChanges();
+    expect(practiceSelection.drills()).toEqual([]);
+    expect(fixture.nativeElement.textContent).toContain('Gate Passing removed from this practice.');
+
+    button.click();
+    fixture.detectChanges();
+    expect(practiceSelection.drills().map((selected) => selected.id)).toEqual(['drill-1']);
+  });
 
   it('filters by age and category through the API and searches the returned drills by name', () => {
     const first: Drill = {

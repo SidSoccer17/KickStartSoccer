@@ -9,76 +9,59 @@
   color: #14243d;
 }
 
-.dashboard-intro {
-  padding: 24px;
-  border-radius: 18px;
-  background: #173b68;
-  color: #fff;
+.library-heading {
+  padding: 24px 16px 0;
+  color: #14243d;
 }
 
-.dashboard-eyebrow {
-  margin-bottom: 12px;
-  color: #78a9f5;
-}
-
-.dashboard-intro h1 {
+.library-heading h1 {
   margin: 0;
   font-size: clamp(1.8rem, 6vw, 2.2rem);
   line-height: 1.2;
 }
 
-.dashboard-tagline {
+.library-heading p:last-child {
   margin: 8px 0 0;
-  color: #e0eaf7;
+  color: #66758a;
   line-height: 1.45;
 }
-
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.summary-card {
-  display: grid;
-  min-height: 116px;
-  align-content: start;
-  gap: 5px;
-  padding: 14px;
-  border-radius: 14px;
-  background: #264d79;
-  color: #fff;
-  text-decoration: none;
-}
-
-.summary-card:focus-visible,
 .add-button:focus-visible,
 .drill-error button:focus-visible {
   outline: 3px solid #78a9f5;
   outline-offset: 2px;
 }
 
-.summary-card svg {
-  width: 20px;
-  height: 20px;
-  margin-bottom: 3px;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
+.practice-draft {
+  display: grid;
+  gap: 10px;
+  margin: 20px 16px 0;
+  padding: 16px;
+  border: 1px solid #d5e3f5;
+  border-radius: 14px;
 }
 
-.summary-card strong {
-  font-size: 1.4rem;
-  line-height: 1.1;
+.practice-draft-summary,
+.practice-draft-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.summary-card span {
-  color: #e0eaf7;
-  font-size: 0.88rem;
+.practice-draft-summary h2 {
+  margin: 0;
+  font-size: 1.1rem;
 }
+
+.practice-draft > label { font-weight: 650; }
+
+.practice-draft > input { min-height: 42px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
+
+.save-practice-button { min-height: 40px; padding: 8px 14px; border: 0; border-radius: 8px; background: #2364d2; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+
+.practice-draft-actions a { color: #2364d2; font-weight: 650; }
+.practice-form-error { color: #8d2525; }
 
 .drill-library {
   padding: 24px 16px 0;
@@ -208,24 +191,15 @@
   font-size: 0.75rem;
 }
 
-.add-button:disabled {
+.add-button.is-selected {
   background: #e8eff9;
   color: #34557f;
-  cursor: default;
 }
 
 @media (min-width: 600px) {
-  .dashboard-intro {
-    padding: 24px;
-  }
-
-  .summary-grid {
-    gap: 12px;
-  }
-
-  .summary-card {
-    min-height: 116px;
-    padding: 16px;
+  .library-heading {
+    padding-right: 24px;
+    padding-left: 24px;
   }
 
   .drill-library {

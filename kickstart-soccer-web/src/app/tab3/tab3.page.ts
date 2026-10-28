@@ -1,20 +1,22 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { IonContent } from '@ionic/angular';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ApiService, Drill } from '../services/api.service';
 import { PracticeSelectionService } from '../services/practice-selection.service';
-import { SeasonPlanningService } from '../services/season-planning.service';
 
 @Component({
-  selector: 'app-tab3',
+  selector: 'app-drill-library',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
-  imports: [IonContent, RouterLink],
+  imports: [IonContent, RouterLink, ReactiveFormsModule],
 })
 export class Tab3Page {
   private readonly apiService = inject(ApiService);
+  private readonly destroyRef = inject(DestroyRef);
   readonly practiceSelection = inject(PracticeSelectionService);
-  readonly seasonPlanning = inject(SeasonPlanningService);
+  readonly practiceName = new FormControl(this.practiceSelection.name(), { nonNullable: true });
 
   readonly drills = signal<Drill[]>([]);
   readonly selectedAge = signal('');
@@ -39,9 +41,15 @@ export class Tab3Page {
   readonly isLoading = signal(true);
   readonly errorMessage = signal<string | null>(null);
   readonly selectionMessage = signal<string | null>(null);
-  readonly selectionCount = computed(() => this.practiceSelection.drills().length);
+  readonly practiceNameError = signal<string | null>(null);
+  readonly practiceSaveMessage = signal<string | null>(null);
 
   constructor() {
+    this.practiceName.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((name) => {
+      this.practiceSelection.setName(name);
+      this.practiceNameError.set(null);
+      this.practiceSaveMessage.set(null);
+    });
     this.loadDrills();
   }
 
@@ -76,7 +84,30 @@ export class Tab3Page {
   }
 
   addToPractice(drill: Drill): void {
-    const added = this.practiceSelection.add(drill);
-    this.selectionMessage.set(added ? null : `${drill.title} is already selected for this practice.`);
+    if (this.practiceSelection.isSelected(drill.id)) {
+      this.practiceSelection.remove(drill.id);
+      this.selectionMessage.set(`${drill.title} removed from this practice.`);
+    } else {
+      this.practiceSelection.add(drill);
+      this.selectionMessage.set(null);
+    }
+    this.practiceSaveMessage.set(null);
+  }
+
+  savePractice(): void {
+    if (!this.practiceSelection.name().trim()) {
+      this.practiceNameError.set('Enter a practice name before saving.');
+      this.practiceSaveMessage.set(null);
+      return;
+    }
+
+    if (this.practiceSelection.saveCurrent()) {
+      this.practiceSelection.newPractice();
+      this.practiceName.reset('');
+      this.practiceNameError.set(null);
+      this.practiceSaveMessage.set('Practice saved. Start another practice or create a season to assign it to a week.');
+    } else {
+      this.practiceSaveMessage.set(null);
+    }
   }
 }
