@@ -1,0 +1,25 @@
+<ion-content [fullscreen]="true" class="detail-content">
+  <main class="detail-page">
+    <a class="back-link" routerLink="/tabs/tab3">Back to Training</a>
+    @if (isLoading()) {
+      <p class="message" role="status">Loading drill details...</p>
+    } @else if (errorMessage(); as error) {
+      <section class="error" role="alert"><p>{{ error }}</p><button type="button" (click)="loadDrill()">Try again</button></section>
+    } @else if (drill(); as activity) {
+      <header class="page-heading"><p class="eyebrow">{{ activity.curriculumId ?? 'DRILL' }} · {{ activity.category }}</p><h1>{{ activity.title }}</h1><p>{{ activity.minimumDurationMinutes ?? activity.durationMinutes }}–{{ activity.maximumDurationMinutes ?? activity.durationMinutes }} minutes · {{ activity.difficulty }}</p></header>
+      <article class="detail-card">
+        <p class="age-skill">{{ activity.ageGroups.join(', ') }} @if (activity.primarySkill) { · {{ activity.primarySkill }} }</p>
+        @if (activity.whatItTeaches) { <section><h2>What players learn</h2><p>{{ activity.whatItTeaches }}</p></section> }
+        <app-field-diagram [diagramKey]="activity.diagramKey" [title]="activity.title" />
+        @if (activity.setupInstructions?.length) { <section><h2>Field setup</h2><ol>@for (step of activity.setupInstructions; track $index) { <li>{{ step }}</li> }</ol></section> }
+        <section><h2>How to play</h2><ol>@for (step of activity.instructions; track $index) { <li>{{ step }}</li> }</ol></section>
+        <section><h2>Equipment</h2><ul>@for (item of activity.equipment; track item) { <li>{{ item }}</li> }</ul></section>
+        <section><h2>Coaching points</h2><ul>@for (cue of activity.coachingTips; track $index) { <li>{{ cue }}</li> }</ul></section>
+        @if (activity.easierVariations?.length) { <section><h2>Make it easier</h2><ul>@for (variation of activity.easierVariations; track $index) { <li>{{ variation }}</li> }</ul></section> }
+        @if (activity.harderVariations?.length) { <section><h2>Make it more challenging</h2><ul>@for (variation of activity.harderVariations; track $index) { <li>{{ variation }}</li> }</ul></section> }
+        @if (activity.safetyConsiderations?.length) { <section class="safety"><h2>Safety</h2><ul>@for (note of activity.safetyConsiderations; track $index) { <li>{{ note }}</li> }</ul></section> }
+        <p class="source">{{ activity.contentSource ?? 'Activity content provided by KickStart Soccer.' }}</p>
+      </article>
+    }
+  </main>
+</ion-content>

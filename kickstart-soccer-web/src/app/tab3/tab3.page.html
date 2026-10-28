@@ -11,6 +11,11 @@
           <strong>{{ isLoading() ? '...' : drills().length }}</strong>
           <span>Available drills</span>
         </a>
+        <a class="summary-card" routerLink="/coach/seasons/new">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18" /></svg>
+          <strong>{{ seasonPlanning.seasonCount() }}</strong>
+          <span>Season plans</span>
+        </a>
         <a class="summary-card" routerLink="/tabs/tab2">
           <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M9 9h6m-6 4h6m-6 4h4"/></svg>
           <strong>{{ selectionCount() }}</strong>
@@ -25,7 +30,21 @@
           <p class="eyebrow">PRACTICE PLANNING</p>
           <h2 id="drill-library-title">Drill Library</h2>
         </div>
-        <span class="drill-count">{{ drills().length }} drills</span>
+        <span class="drill-count">{{ filteredDrills().length }} of {{ drills().length }} drills</span>
+      </div>
+
+      <div class="drill-filters" aria-label="Filter drills">
+        <label for="age-filter">Age group</label>
+        <select id="age-filter" [value]="selectedAge()" (change)="updateAge($event)">
+          <option value="">All ages</option><option value="U6">U6</option><option value="U7">U7</option><option value="U8">U8</option>
+        </select>
+        <label for="category-filter">Category</label>
+        <select id="category-filter" [value]="selectedCategory()" (change)="updateCategory($event)">
+          <option value="">All categories</option>
+          @for (category of categories; track category) { <option [value]="category">{{ category }}</option> }
+        </select>
+        <label for="drill-search">Search drills</label>
+        <input id="drill-search" type="search" placeholder="Search by name or skill" [value]="searchTerm()" (input)="updateSearch($event)" />
       </div>
 
       @if (isLoading()) {
@@ -41,18 +60,23 @@
         @if (selectionMessage(); as message) {
           <p class="drill-message" role="status">{{ message }}</p>
         }
+        @if (filteredDrills().length === 0) {
+          <p class="drill-message">No drills match these filters. Try a different age, category, or search.</p>
+        } @else {
         <div class="drill-list">
-          @for (drill of drills(); track drill.id) {
+          @for (drill of filteredDrills(); track drill.id) {
             <article class="drill-card">
               <div class="drill-icon" aria-hidden="true">&#9917;</div>
               <div class="drill-details">
                 <h3>{{ drill.title }}</h3>
-                <p>{{ drill.category }} &middot; {{ drill.ageGroups.join(', ') }}</p>
+                <p>{{ drill.category }} &middot; {{ drill.ageGroups.join(', ') }} @if (drill.primarySkill) { &middot; {{ drill.primarySkill }} }</p>
                 <div class="drill-meta">
-                  <span>{{ drill.durationMinutes }} min</span>
+                  <span class="duration-range">{{ drill.minimumDurationMinutes ?? drill.durationMinutes }}–{{ drill.maximumDurationMinutes ?? drill.durationMinutes }} min</span>
+                  <span>{{ drill.durationMinutes }} min recommended</span>
                   <span>{{ drill.difficulty }}</span>
                 </div>
               </div>
+              <a class="details-link" [routerLink]="['/coach/drills', drill.id]">View details</a>
               <button
                 class="add-button"
                 type="button"
@@ -64,6 +88,7 @@
             </article>
           }
         </div>
+        }
       }
     </section>
   </main>

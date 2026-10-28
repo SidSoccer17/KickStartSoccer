@@ -1,0 +1,36 @@
+<ion-content [fullscreen]="true" class="season-content">
+  <main class="season-page">
+    <a class="back-link" routerLink="/coach/seasons/new">Back to seasons</a>
+    @if (season(); as current) {
+      <header class="page-heading"><p class="eyebrow">SEASON PLAN</p><h1>{{ current.term === 'spring' ? 'Spring' : 'Fall' }} {{ current.ageGroup }}</h1><p>{{ current.weeks }} weeks · {{ current.practiceDurationMinutes }} minute practices · {{ current.minPlayers }}–{{ current.maxPlayers }} players</p></header>
+      <div class="season-save">
+        <button type="button" (click)="saveSeason()">Save season updates</button>
+        @if (hasUnsavedChanges()) { <p role="status">You have unsaved changes to this season.</p> }
+        @if (saveMessage(); as message) { <p role="status">{{ message }}</p> }
+      </div>
+      <section class="week-list" aria-label="Weekly season plan">
+        @for (session of weeks(); track session.id) {
+          <article class="week-card">
+            <div class="week-title"><p class="eyebrow">WEEK {{ session.weekNumber }}</p><h2>Practice {{ session.sessionNumber }}</h2></div>
+            @if (assignedPractice(session.practicePlanId); as practice) {
+              <p class="assigned-plan"><a [routerLink]="['/coach/practices', practice.id]" [queryParams]="{seasonId: current.id}">{{ practice.name }}</a><span>{{ practice.drills.length }} activities</span></p>
+            } @else {
+              <p class="unassigned">{{ session.practicePlanId ? 'Previously assigned practice is no longer saved.' : 'No practice assigned' }}</p>
+            }
+            <label [for]="'date-' + session.id">Practice date (optional)</label>
+            <input [id]="'date-' + session.id" type="date" [value]="session.scheduledDate ?? ''" (change)="setScheduledDate(session.id, $event)" />
+            <label [for]="'practice-' + session.id">Assign a saved practice</label>
+            <select [id]="'practice-' + session.id" [value]="session.practicePlanId ?? ''" (change)="assignPractice(session.id, $event)">
+              <option value="">Unassigned</option>
+              @for (practice of practices.savedPractices(); track practice.id) { <option [value]="practice.id">{{ practice.name }}</option> }
+            </select>
+          </article>
+        }
+      </section>
+      @if (planning.persistenceError(); as error) { <p class="error-message" role="alert">{{ error }}</p> }
+      @if (practices.savedPractices().length === 0) { <p class="empty-note">Save a practice in the Practice Plan tab to assign it here.</p> }
+    } @else {
+      <section class="not-found"><h1>Season not found</h1><p>This season may have been removed from local storage.</p><a routerLink="/coach/seasons/new">Create or open a season</a></section>
+    }
+  </main>
+</ion-content>

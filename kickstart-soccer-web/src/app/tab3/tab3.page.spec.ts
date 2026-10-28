@@ -112,6 +112,43 @@ describe('Tab3Page', () => {
     expect(fixture.nativeElement.textContent).toContain('Gate Passing is already selected');
   });
 
+
+  it('filters by age and category through the API and searches the returned drills by name', () => {
+    const first: Drill = {
+      id: 'd01', curriculumId: 'D01', title: 'Red Light, Green Light', ageGroups: ['U6', 'U7'],
+      category: 'Ball Mastery and Warm-ups', difficulty: 'beginner', durationMinutes: 7,
+      minimumDurationMinutes: 6, maximumDurationMinutes: 8, instructions: ['Stop the ball on red.'],
+      coachingTips: ['Look up.'], equipment: ['Balls'], primarySkill: 'Dribbling',
+    };
+    const second: Drill = {
+      ...first, id: 'd08', curriculumId: 'D08', title: 'Gates Dribbling',
+      category: 'Dribbling and Turning', primarySkill: 'Dribbling',
+    };
+    httpTestingController.expectOne('http://localhost:8080/api/drills').flush([first, second]);
+    fixture.detectChanges();
+
+    const age = fixture.nativeElement.querySelector('#age-filter') as HTMLSelectElement;
+    age.value = 'U6';
+    age.dispatchEvent(new Event('change'));
+    const ageRequest = httpTestingController.expectOne('http://localhost:8080/api/drills?age=U6');
+    expect(ageRequest.request.method).toBe('GET');
+    ageRequest.flush([first, second]);
+
+    const category = fixture.nativeElement.querySelector('#category-filter') as HTMLSelectElement;
+    category.value = 'Dribbling and Turning';
+    category.dispatchEvent(new Event('change'));
+    httpTestingController.expectOne('http://localhost:8080/api/drills?age=U6&category=Dribbling%20and%20Turning').flush([second]);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.drill-card')).toHaveLength(1);
+    expect(fixture.nativeElement.textContent).toContain('Gates Dribbling');
+
+    const search = fixture.nativeElement.querySelector('#drill-search') as HTMLInputElement;
+    search.value = 'no matching activity';
+    search.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('No drills match these filters');
+  });
+
   it('shows an error and retry action when loading drills fails', () => {
     httpTestingController.expectOne('http://localhost:8080/api/drills').flush(
       { message: 'Service unavailable' },

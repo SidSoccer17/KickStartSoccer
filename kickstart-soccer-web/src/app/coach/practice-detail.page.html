@@ -1,0 +1,22 @@
+<ion-content [fullscreen]="true" class="detail-content">
+  <main class="detail-page">
+    @if (practice(); as plan) {
+      @if (seasonId) { <a class="back-link" [routerLink]="['/coach/seasons', seasonId]">Back to season plan</a> } @else { <a class="back-link" routerLink="/tabs/tab2">Back to Practice Plan</a> }
+      <header class="page-heading"><p class="eyebrow">PRACTICE DETAIL</p><h1>{{ plan.name }}</h1><p>{{ plan.drills.length }} activities · {{ totalDuration() }} minutes total</p></header>
+      @if (activity(); as drill) {
+        <article class="activity-card" aria-live="polite">
+          <p class="activity-count">Activity {{ activeIndex() + 1 }} of {{ plan.drills.length }}</p>
+          <h2>{{ drill.title }}</h2>
+          <p class="activity-meta">{{ drill.category }} · {{ drill.durationMinutes }} minutes · {{ drill.difficulty }}</p>
+          <app-field-diagram [diagramKey]="drill.diagramKey" [title]="drill.title" />
+          <section><h3>Instructions</h3><ol>@for (instruction of drill.instructions; track $index) { <li>{{ instruction }}</li> }</ol></section>
+          <section><h3>Equipment</h3>@if (drill.equipment.length) { <ul>@for (item of drill.equipment; track item) { <li>{{ item }}</li> }</ul> } @else { <p>None specified</p> }</section>
+          <section><h3>Coaching tips</h3>@if (drill.coachingTips.length) { <ul>@for (tip of drill.coachingTips; track $index) { <li>{{ tip }}</li> }</ul> } @else { <p>No coaching tips specified</p> }</section>
+          <nav class="activity-navigation" aria-label="Practice activity navigation"><button type="button" (click)="previous()" [disabled]="activeIndex() === 0">Previous</button><button type="button" (click)="next()" [disabled]="activeIndex() === plan.drills.length - 1">Next</button></nav>
+        </article>
+      } @else { <p class="empty-note">This saved practice has no activities.</p> }
+    } @else {
+      <section class="not-found"><h1>Practice not found</h1><p>This practice may have been removed from this device.</p><a routerLink="/tabs/tab2">Open Practice Plan</a></section>
+    }
+  </main>
+</ion-content>

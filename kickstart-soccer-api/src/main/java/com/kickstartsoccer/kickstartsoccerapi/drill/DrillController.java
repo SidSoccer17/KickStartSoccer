@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,8 +27,20 @@ public class DrillController {
     }
 
     @GetMapping
-    public List<Drill> findAll() {
-        return drillService.findAll();
+    public List<Drill> findAll(
+            @RequestParam(required = false) String age,
+            @RequestParam(required = false) String category) {
+        return drillService.findAll(age, category);
+    }
+
+    @GetMapping("/categories")
+    public List<String> categories() {
+        return drillService.categories();
+    }
+
+    @GetMapping("/curriculum/{curriculumId}")
+    public Drill findByCurriculumId(@PathVariable String curriculumId) {
+        return drillService.findByCurriculumId(curriculumId);
     }
 
     @GetMapping("/{id}")

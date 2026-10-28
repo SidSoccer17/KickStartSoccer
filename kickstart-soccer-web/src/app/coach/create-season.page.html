@@ -1,0 +1,19 @@
+<ion-content [fullscreen]="true" class="season-content">
+  <main class="season-page">
+    <a class="back-link" routerLink="/tabs/tab3">Back to Coach Dashboard</a>
+    <header class="page-heading"><p class="eyebrow">SEASON PLANNING</p><h1>Create Season</h1><p>Set up your team's season. Season details and weekly sessions are saved on this device.</p></header>
+    <section class="form-card" aria-label="Season details">
+      <label for="season-term">Season</label><select id="season-term" [value]="term()" (change)="updateTerm($event)"><option value="spring">Spring</option><option value="fall">Fall</option></select>
+      <label for="season-age">Age group</label><select id="season-age" [value]="ageGroup()" (change)="updateAgeGroup($event)"><option value="U6">U6</option><option value="U7">U7</option></select>
+      <label for="season-weeks">Season length</label><select id="season-weeks" [value]="weeks()" (change)="updateWeeks($event)"><option value="8">8 weeks</option><option value="10">10 weeks</option></select>
+      <label for="practice-duration">Practice duration</label><select id="practice-duration" [value]="duration()" (change)="updateDuration($event)"><option value="45">45 minutes</option><option value="60">60 minutes</option></select>
+      <fieldset class="player-range"><legend>Player-count range</legend><div><label for="min-players">Minimum players</label><input id="min-players" type="number" min="1" step="1" required [value]="minPlayers()" (input)="updateMinPlayers($event)" /></div><div><label for="max-players">Maximum players</label><input id="max-players" type="number" min="1" step="1" required [value]="maxPlayers()" (input)="updateMaxPlayers($event)" /></div></fieldset>
+      @if (errorMessage(); as error) { <p class="error-message" role="alert">{{ error }}</p> }
+      @if (planning.persistenceError(); as error) { <p class="error-message" role="alert">{{ error }}</p> }
+      <button class="primary-button" type="button" (click)="createSeason()">Create season</button>
+    </section>
+    <section class="saved-seasons" aria-labelledby="saved-seasons-title"><h2 id="saved-seasons-title">Your seasons</h2>
+      @if (planning.seasons().length === 0) { <p>No seasons created on this device yet.</p> } @else { <ul>@for (season of planning.seasons(); track season.id) { <li><a [routerLink]="['/coach/seasons', season.id]">{{ season.term === 'spring' ? 'Spring' : 'Fall' }} {{ season.ageGroup }} · {{ season.weeks }} weeks</a></li> }</ul> }
+    </section>
+  </main>
+</ion-content>
