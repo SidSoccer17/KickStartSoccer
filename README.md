@@ -17,7 +17,7 @@ I'm also interested in coding and engineering, so I thought this would be a fun 
 KickStartSoccer is a functional youth soccer coaching app built with
 Ionic/Angular and Spring Boot.
 
-[Watch the 90-second demo](docs/demo/kickstartsoccer-demo.mp4)
+[Watch the 90-second demo](docs/KickStartSoccer-Demo.mp4)
 
 Pilot/user rollout is planned for Nov–Dec 2026.
 
