@@ -41,12 +41,14 @@ I worked on getting the frontend and backend to communicate so that coaches coul
 ## Project Structure
 
 
+```text
 KickStartSoccer/
 ├── README.md
-├── kickstart-soccer-api/      # Java Spring Boot backend
-├── kickstart-soccer-web/      # Ionic Angular frontend
+├── kickstart-soccer-api/  # Java Spring Boot backend
+├── kickstart-soccer-web/  # Ionic Angular frontend
 └── .gitignore
 ```
+
 
 ## Running the App
 
