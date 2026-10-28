@@ -1,0 +1,40 @@
+<ion-content [fullscreen]="true" class="more-content">
+  <main class="more-page">
+    <p class="eyebrow">KICKSTART SOCCER</p>
+    <h1>More</h1>
+
+    <section class="role-card" aria-label="Current role">
+      <div>
+        <h2>{{ roles.selectedRole() === 'coach' ? 'Coach' : roles.selectedRole() === 'parent' ? 'Parent' : 'Player' }} experience</h2>
+        <p>Your role preference is stored on this device only; it is not an account or access control.</p>
+      </div>
+      <button type="button" (click)="changeRole()">Change role</button>
+    </section>
+    @if (roles.persistenceError(); as error) {
+      <p class="error-message" role="alert">{{ error }}</p>
+    }
+
+    @if (roles.isCoach()) {
+      <section class="quick-links" aria-label="Coach tools">
+        <a routerLink="/seasons">My Seasons</a>
+        <a routerLink="/coach/seasons/new">Create a season</a>
+        <a routerLink="/library">Drill Library</a>
+      </section>
+    }
+
+    <section class="planned-features" aria-label="Planned features">
+      <article id="ai-coach">
+        <h2>AI Coach</h2>
+        <p>Not available yet. Practice-generation inputs, review controls, and a supporting API need to be decided first.</p>
+      </article>
+      <article id="reports">
+        <h2>Reports</h2>
+        <p>Not available yet. The app does not collect attendance, player outcomes, or other reportable team data.</p>
+      </article>
+      <article id="settings">
+        <h2>Settings</h2>
+        <p>Not available yet. Account, team, privacy, and synchronization preferences have no backend foundation.</p>
+      </article>
+    </section>
+  </main>
+</ion-content>

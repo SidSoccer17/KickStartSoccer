@@ -1,0 +1,90 @@
+.more-content {
+  --background: #f5f7fa;
+}
+
+.more-page {
+  display: grid;
+  width: min(100% - 32px, 760px);
+  gap: 16px;
+  margin: 0 auto;
+  padding: 24px 0 40px;
+  color: #14243d;
+}
+
+.eyebrow {
+  margin: 0 0 -12px;
+  color: #2364d2;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 7vw, 2.3rem);
+}
+
+.role-card,
+.planned-features article {
+  padding: 18px;
+  border: 1px solid #e0e6ee;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.role-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.role-card h2,
+.planned-features h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.role-card p,
+.planned-features p {
+  margin: 8px 0 0;
+  color: #52627a;
+  line-height: 1.5;
+}
+
+.role-card button {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #173b68;
+  font: inherit;
+  font-weight: 650;
+}
+
+.quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.quick-links a {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #e8eff9;
+  color: #173b68;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.planned-features {
+  display: grid;
+  gap: 10px;
+}
+
+.error-message {
+  margin: 0;
+  color: #8d2525;
+}

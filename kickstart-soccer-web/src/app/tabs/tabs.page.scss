@@ -1,1 +1,83 @@
 
+.tabs-shell {
+  height: 100%;
+}
+
+ion-tabs {
+  display: block;
+  height: 100%;
+}
+
+.coach-sidebar {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .tabs-shell.coach-layout {
+    display: flex;
+  }
+
+  .coach-layout ion-tabs {
+    width: calc(100% - 248px);
+    margin-inline-start: 248px;
+  }
+
+  .coach-layout ion-tab-bar {
+    display: none;
+  }
+
+  .coach-sidebar {
+    position: fixed;
+    z-index: 10;
+    inset: 0 auto 0 0;
+    display: flex;
+    width: 248px;
+    flex-direction: column;
+    gap: 30px;
+    padding: 28px 16px;
+    border-inline-end: 1px solid #e0e6ee;
+    background: #fff;
+    color: #14243d;
+  }
+
+  .brand {
+    padding: 0 12px;
+    color: #173b68;
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+
+  .brand span {
+    color: #2364d2;
+  }
+
+  .sidebar-links {
+    display: grid;
+    gap: 6px;
+  }
+
+  .sidebar-links a {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+    border-radius: 9px;
+    color: #52627a;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .sidebar-links a.active,
+  .sidebar-links a:hover {
+    background: #edf4ff;
+    color: #173b68;
+  }
+
+  .sidebar-links ion-icon {
+    font-size: 1.15rem;
+  }
+}
