@@ -1,8 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular';
-
-type RoleId = 'coach' | 'parent' | 'player';
+import { UserRoleService, type UserRole } from '../services/user-role.service';
 
 @Component({
   selector: 'app-tab1',
@@ -13,9 +12,10 @@ type RoleId = 'coach' | 'parent' | 'player';
 })
 export class Tab1Page {
   private readonly router = inject(Router);
+  readonly roleService = inject(UserRoleService);
 
   readonly roles: ReadonlyArray<{
-    id: RoleId;
+    id: UserRole;
     label: string;
     description: string;
   }> = [
@@ -24,17 +24,21 @@ export class Tab1Page {
     { id: 'player', label: 'Player', description: 'I want to learn and have fun' }
   ];
 
-  readonly selectedRole = signal<RoleId | null>(null);
+  readonly selectedRole = signal<UserRole | null>(this.roleService.selectedRole());
 
-  selectRole(role: RoleId): void {
+  selectRole(role: UserRole): void {
     this.selectedRole.set(role);
-
-    if (role === 'coach') {
-      void this.router.navigateByUrl('/tabs/tab3');
-    }
   }
 
-  roleLabel(roleId: RoleId): string {
+  start(): void {
+    const role = this.selectedRole();
+    if (!role) return;
+
+    this.roleService.selectRole(role);
+    void this.router.navigateByUrl('/dashboard');
+  }
+
+  roleLabel(roleId: UserRole): string {
     return this.roles.find((role) => role.id === roleId)?.label ?? roleId;
   }
 }

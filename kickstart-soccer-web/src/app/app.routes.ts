@@ -1,24 +1,44 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router, Routes } from '@angular/router';
+import { requireRole } from './services/app-role.guards';
 
 export const routes: Routes = [
   {
-    path: 'coach/drills/:drillId',
-    loadComponent: () => import('./coach/drill-detail.page').then((m) => m.DrillDetailPage),
+    path: 'onboarding',
+    loadComponent: () => import('./tab1/tab1.page').then((m) => m.Tab1Page),
   },
   {
-    path: 'coach/seasons/new',
-    loadComponent: () => import('./coach/create-season.page').then((m) => m.CreateSeasonPage),
+    path: 'home',
+    pathMatch: 'full',
+    redirectTo: '/onboarding',
   },
   {
-    path: 'coach/seasons/:seasonId',
-    loadComponent: () => import('./coach/season-overview.page').then((m) => m.SeasonOverviewPage),
+    path: 'tabs/tab1',
+    redirectTo: '/onboarding',
+    pathMatch: 'full',
   },
   {
-    path: 'coach/practices/:practiceId',
-    loadComponent: () => import('./coach/practice-detail.page').then((m) => m.PracticeDetailPage),
+    path: 'tabs/tab2',
+    redirectTo: '/plan',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tabs/tab3',
+    redirectTo: '/dashboard',
+    pathMatch: 'full',
   },
   {
     path: '',
+    pathMatch: 'full',
+    redirectTo: '/onboarding',
+  },
+  {
+    path: '',
+    canActivateChild: [requireRole],
     loadChildren: () => import('./tabs/tabs.routes').then((m) => m.routes),
+  },
+  {
+    path: '**',
+    redirectTo: '/onboarding',
   },
 ];

@@ -1,7 +1,6 @@
 <ion-content [fullscreen]="true" class="welcome-content">
   <main class="welcome-page">
     <section class="welcome-panel" aria-labelledby="welcome-title">
-      <p class="eyebrow">KICKSTART SOCCER</p>
       <h1 id="welcome-title">Welcome to<br />KickStart Soccer!</h1>
       <p class="prompt">Who are you?</p>
 
@@ -27,9 +26,16 @@
         @if (selectedRole(); as roleId) {
           {{ roleLabel(roleId) }} selected
         } @else {
-          Select a role to get started.
+          &nbsp;
         }
       </p>
+      @if (roleService.persistenceError(); as error) {
+        <p class="persistence-error" role="alert">{{ error }}</p>
+      }
+
+      <button class="start-button" type="button" [disabled]="!selectedRole()" (click)="start()">
+        Let’s get started!
+      </button>
 
       <div class="progress" aria-label="Onboarding step 1 of 3">
         <span class="progress-dot active"></span>
